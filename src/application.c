@@ -6,7 +6,6 @@
 #define SERVICE_INTERVAL_INTERVAL (11 * 60 * 1000)
 
 #define TMP112_UPDATE_INTERVAL (3500)
-#define VOC_LP_TAG_UPDATE_INTERVAL (3500)
 #define HUMIDITY_TAG_UPDATE_INTERVAL (3500)
 
 #define RADIO_SEND_INTERVAL 2000
@@ -26,7 +25,6 @@ static struct
 {
     float_t temperature;
     float_t humidity;
-    float_t tvoc;
     float_t battery_voltage;
     float_t battery_pct;
 
@@ -46,7 +44,6 @@ static const struct
 } pages[] = {
     {"Temperature   ", "%.1f", &values.temperature, "\xb0" "C",
      "Humidity      ", "%.1f", &values.humidity, "%"},
-    {"TVOC          ", "%.1f", &values.tvoc, "ppb"},
     {"Battery       ", "%.2f", &values.battery_voltage, "V",
      "Battery       ", "%.0f", &values.battery_pct, "%"},
 };
@@ -71,7 +68,6 @@ static void humidity_tag_init(twr_tag_humidity_revision_t revision, twr_i2c_chan
 void lcd_event_handler(twr_module_lcd_event_t event, void *event_param);
 void tmp112_event_handler(twr_tmp112_t *self, twr_tmp112_event_t event, void *event_param);
 void humidity_tag_event_handler(twr_tag_humidity_t *self, twr_tag_humidity_event_t event, void *event_param);
-void voc_lp_tag_event_handler(twr_tag_voc_lp_t *self, twr_tag_voc_lp_event_t event, void *event_param);
 
 static void lcd_page_render()
 {
@@ -236,33 +232,6 @@ void lcd_event_handler(twr_module_lcd_event_t event, void *event_param)
     twr_scheduler_plan_now(0);
 }
 
-
-void voc_lp_tag_event_handler(twr_tag_voc_lp_t *self, twr_tag_voc_lp_event_t event, void *event_param)
-{
-    event_param_t *param = (event_param_t *)event_param;
-
-    if (event == TWR_TAG_VOC_LP_EVENT_UPDATE)
-    {
-        uint16_t value;
-
-        if (twr_tag_voc_lp_get_tvoc_ppb(self, &value))
-        {
-            /*if (((param->next_pub < twr_scheduler_get_spin_tick())) && active_mode)
-            {*/
-                param->value = value;
-
-                int radio_tvoc = value;
-
-                values.tvoc = radio_tvoc;
-
-                //twr_radio_pub_int("voc-lp-sensor/0:0/tvoc", &radio_tvoc);
-                twr_scheduler_plan_now(0);
-
-            //}
-        }
-    }
-}
-
 void tmp112_event_handler(twr_tmp112_t *self, twr_tmp112_event_t event, void *event_param)
 {
     float value;
@@ -338,7 +307,6 @@ void send_data_over_radio()
     if(active_mode)
     {
         twr_radio_pub_temperature(0, &values.temperature);
-        twr_radio_pub_float("voc-lp-sensor/0:0/tvoc", &values.tvoc);
         twr_radio_pub_humidity(0, &values.humidity);
     }
     twr_scheduler_plan_current_from_now(RADIO_SEND_INTERVAL);
@@ -385,13 +353,6 @@ void application_init(void)
 
     static humidity_tag_t humidity_tag_1_4;
     humidity_tag_init(TWR_TAG_HUMIDITY_REVISION_R3, TWR_I2C_I2C1, &humidity_tag_1_4);
-
-    // VOC-LP
-    static twr_tag_voc_lp_t voc_lp;
-    static event_param_t voc_lp_event_param = { .next_pub = 0 };
-    twr_tag_voc_lp_init(&voc_lp, TWR_I2C_I2C0);
-    twr_tag_voc_lp_set_event_handler(&voc_lp, voc_lp_tag_event_handler, &voc_lp_event_param);
-    twr_tag_voc_lp_set_update_interval(&voc_lp, VOC_LP_TAG_UPDATE_INTERVAL);
 
     // LCD
     twr_module_lcd_init();
