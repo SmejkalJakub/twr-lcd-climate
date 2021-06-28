@@ -66,14 +66,14 @@ jobs:
         run: |
           pio run -e release
           
-      #- name: Upload release binary
-      #  uses: actions/upload-release-asset@v1.0.2
-      #  env:
-      #    GITHUB_TOKEN: ${{ github.token }}
-      #  with:
-      #    upload_url: ${{ steps.get_release.outputs.upload_url }}
-      #    asset_path: ./target/release/my-widget
-      #    asset_name: my-widget
-      #    asset_content_type: application/octet-stream
+      - name: Upload release binary
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: .pio/build/release/firmware.bin
+          asset_name: ${{ env.REPOSITORY_NAME }}-${{ env.GITHUB_TAG }}.bin
+          asset_content_type: application/octet-stream
 
  
