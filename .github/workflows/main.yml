@@ -36,7 +36,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
 
       - name: Set env
-        run: if [ -z "$GITHUB_TAG" ] then "GITHUB_TAG=-vdev" >> $GITHUB_EVN else GITHUB_TAG >> $GITHUB_EVN fi  
+        run: if [[ -z "$GITHUB_TAG" ]] then "GITHUB_TAG=-vdev" >> $GITHUB_EVN else GITHUB_TAG >> $GITHUB_EVN fi  
             
       - name: Test
         run: |
