@@ -39,7 +39,7 @@ static const struct
     char *name1;
     char *format1;
     float_t *value1;
-    char *unit1;
+    char *unit1
 
 } pages[] = {
     {"Temperature   ", "%.1f", &values.temperature, "\xb0" "C",
