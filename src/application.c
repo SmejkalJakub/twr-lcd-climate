@@ -48,8 +48,8 @@ static const struct
      "Battery       ", "%.0f", &values.battery_pct, "%"},
 };
 
-static int page_index = 0
-static int menu_item = 0
+static int page_index = 0;
+static int menu_item = 0;
 
 twr_led_t led_lcd_green;
 
