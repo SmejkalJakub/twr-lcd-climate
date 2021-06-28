@@ -3,7 +3,7 @@
 # Firmware Skeleton for HARDWARIO TOWER Core Module
 
 [![build](https://github.com/hardwario/twr-lcd-climate/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/hardwario/twr-lcd-climate/actions/workflows/main.yml)
-[![Release](https://img.shields.io/github/release/hardwario/twr-skeleton.svg)](https://github.com/hardwario/twr-skeleton/releases)
+[![Release](https://img.shields.io/github/release/hardwario/twr-lcd-climate.svg)](https://github.com/hardwario/twr-lcd-climate/releases)
 [![License](https://img.shields.io/github/license/hardwario/twr-skeleton.svg)](https://github.com/hardwario/twr-skeleton/blob/master/LICENSE)
 [![Twitter](https://img.shields.io/twitter/follow/hardwario_en.svg?style=social&label=Follow)](https://twitter.com/hardwario_en)
 
