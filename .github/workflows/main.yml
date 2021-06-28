@@ -49,6 +49,12 @@ jobs:
         uses: bruceadams/get-release@v1.2.2
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          
+      - name: Set env
+        if: ${{ github.event_name == 'release' }}
+        run: |
+          echo "GITHUB_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+          echo "REPOSITORY_NAME=${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
       
       - name: Compile the project
         env:
