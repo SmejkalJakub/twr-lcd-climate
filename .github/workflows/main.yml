@@ -7,6 +7,8 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
+  release:
+    types: [published]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -35,18 +37,18 @@ jobs:
           path: ~/.platformio
           key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
 
-      #- name: Set env
-      #  run: echo "GITHUB_TAG=${GITHUB_REF}" >> $GITHUB_ENV
-      #- name: Test
-      #  run: |
-      #    echo $GITHUB_TAG
-      #    echo ${{ env.GITHUB_TAG }}
-
       - name: Install Platformio
         run: |
           echo Hello, world!
           python -m pip install --upgrade pip
           pip install --upgrade platformio
+          
+      - name: Get release
+        if: ${{ github.event_name == 'release' }}
+        id: get_release
+        uses: bruceadams/get-release@v1.2.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       
       - name: Compile the project
         env:
@@ -54,6 +56,14 @@ jobs:
         run: |
           pio run -e release
 
-        #  echo ${{ env.GITHUB_TAG }}
-        #  export PLATFORMIO_BUILD_FLAGS="-D'VERSION=\"${VERSION}\"'"
+      - name: Release project
+        if: ${{ github.event_name == 'release' }}
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: .pio/build/release/firmware.bin
+          asset_name: ${{ env.REPOSITORY_NAME }}-${{ env.GITHUB_TAG }}.bin
+          asset_content_type: application/octet-stream
 
