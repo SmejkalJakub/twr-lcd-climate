@@ -43,7 +43,7 @@ jobs:
       
       - name: Compile the project
         env:
-          VERSION: ${{env.GITHUB_TAG:-vdev}}
+          VERSION: ${env.GITHUB_TAG:-vdev}
         run: |
           export PLATFORMIO_BUILD_FLAGS="-D'VERSION=\"${VERSION}\"'"
           pio run -e release
