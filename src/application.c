@@ -39,7 +39,7 @@ static const struct
     char *name1;
     char *format1;
     float_t *value1;
-    char *unit1
+    char *unit1;
 
 } pages[] = {
     {"Temperature   ", "%.1f", &values.temperature, "\xb0" "C",
@@ -48,8 +48,8 @@ static const struct
      "Battery       ", "%.0f", &values.battery_pct, "%"},
 };
 
-static int page_index = 0;
-static int menu_item = 0;
+static int page_index = 0
+static int menu_item = 0
 
 twr_led_t led_lcd_green;
 
