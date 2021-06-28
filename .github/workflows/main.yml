@@ -42,6 +42,12 @@ jobs:
           echo Hello, world!
           python -m pip install --upgrade pip
           pip install --upgrade platformio
+      
+      - name: Compile the project
+        env:
+          VERSION: ${{env.GITHUB_TAG}}
+        run: |
+          pio run -e release
           
       - name: Get release
         if: ${{ github.event_name == 'release' }}
@@ -55,12 +61,6 @@ jobs:
         run: |
           echo "GITHUB_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
           echo "REPOSITORY_NAME=${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
-      
-      - name: Compile the project
-        env:
-          VERSION: ${{env.GITHUB_TAG}}
-        run: |
-          pio run -e release
 
       - name: Release project
         if: ${{ github.event_name == 'release' }}
