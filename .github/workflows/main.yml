@@ -35,12 +35,12 @@ jobs:
           path: ~/.platformio
           key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
 
-      - name: Set env
-        run: echo "GITHUB_TAG=${GITHUB_REF}" >> $GITHUB_ENV
-      - name: Test
-        run: |
-          echo $GITHUB_TAG
-          echo ${{ env.GITHUB_TAG }}
+      #- name: Set env
+      #  run: echo "GITHUB_TAG=${GITHUB_REF}" >> $GITHUB_ENV
+      #- name: Test
+      #  run: |
+      #    echo $GITHUB_TAG
+      #    echo ${{ env.GITHUB_TAG }}
 
       - name: Install Platformio
         run: |
@@ -52,7 +52,8 @@ jobs:
         env:
           VERSION: ${{env.GITHUB_TAG}}
         run: |
-          echo ${{ env.GITHUB_TAG }}
-          export PLATFORMIO_BUILD_FLAGS="-D'VERSION=\"${VERSION}\"'"
           pio run -e release
+
+        #  echo ${{ env.GITHUB_TAG }}
+        #  export PLATFORMIO_BUILD_FLAGS="-D'VERSION=\"${VERSION}\"'"
 
