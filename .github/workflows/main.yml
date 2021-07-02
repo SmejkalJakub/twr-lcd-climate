@@ -49,6 +49,8 @@ jobs:
         if: ${{ github.event_name == 'release' }}
         id: get_release
         uses: bruceadams/get-release@v1.2.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
           
       # Setup env variables for the release
       - name: Set env
