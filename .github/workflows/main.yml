@@ -42,18 +42,13 @@ jobs:
       
       # Compile the project to see if everything is alright
       - name: Compile the project
-        env:
-          VERSION: ${{env.GITHUB_TAG}}
-        run: |
-          pio run -e release
+        run: pio run -e release
       
       # Get url of newly created release
       - name: Get release
         if: ${{ github.event_name == 'release' }}
         id: get_release
         uses: bruceadams/get-release@v1.2.2
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
           
       # Setup env variables for the release
       - name: Set env
@@ -66,8 +61,6 @@ jobs:
       - name: Release project
         if: ${{ github.event_name == 'release' }}
         uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.get_release.outputs.upload_url }}
           asset_path: .pio/build/release/firmware.bin
