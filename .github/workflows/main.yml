@@ -25,7 +25,6 @@ jobs:
       - name: Compile the project
         run: |
               pio run -e release
-              mv .pio/build/release/firmware.bin ${{ env.REPOSITORY_NAME }}-${{ env.GITHUB_TAG }}.bin
 
       - name: Release
         if: ${{ github.event_name == 'release' }}
@@ -39,6 +38,8 @@ jobs:
         run: |
           echo "GITHUB_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
           echo "REPOSITORY_NAME=${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
+          mv .pio/build/release/firmware.bin ${{ env.REPOSITORY_NAME }}-${{ env.GITHUB_TAG }}.bin
+
 
       - name: Release project
         if: ${{ github.event_name == 'release' }}
