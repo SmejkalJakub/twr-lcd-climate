@@ -1,72 +1,46 @@
 name: build
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or release events but only for the main or master(legacy) branch
   push:
     branches: [main, master]
   release:
     types: [published]
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v2
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-      - name: Cache PlatformIO
-        uses: actions/cache@v2
-        with:
-          path: ~/.platformio
-          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
-
-      # Install PlatformIO tools with pip
       - name: Install Platformio
         run: |
           python -m pip install --upgrade pip
-          pip install --upgrade platformio
-      
-      # Compile the project to see if everything is alright
+          pip install -r requirements.txt
+
       - name: Compile the project
         run: pio run -e release
-      
-      # Get url of newly created release
-      - name: Get release
+
+      - name: Release
         if: ${{ github.event_name == 'release' }}
-        id: get_release
-        uses: bruceadams/get-release@v1.2.2
+        id: release
+        uses: bruceadams/get-release@latest
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          
-      # Setup env variables for the release
+
       - name: Set env
         if: ${{ github.event_name == 'release' }}
         run: |
           echo "GITHUB_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
           echo "REPOSITORY_NAME=${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
 
-      # Put the final firmware binary into the release
       - name: Release project
         if: ${{ github.event_name == 'release' }}
-        uses: actions/upload-release-asset@v1.0.2
+        uses: softprops/action-gh-release@latest
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          upload_url: ${{ steps.release.outputs.upload_url }}
           asset_path: .pio/build/release/firmware.bin
           asset_name: ${{ env.REPOSITORY_NAME }}-${{ env.GITHUB_TAG }}.bin
           asset_content_type: application/octet-stream
