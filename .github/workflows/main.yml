@@ -22,16 +22,8 @@ jobs:
           update-setuptools: "false"
           update-wheel: "false"
 
-      - name: Compile the project
-        run: |
-              pio run -e release
-
-      - name: Release
-        if: ${{ github.event_name == 'release' }}
-        id: release
-        uses: bruceadams/get-release@v1.2.2
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+      - name: Compile
+        run: pio run -e release
 
       - name: Set env
         if: ${{ github.event_name == 'release' }}
@@ -40,7 +32,7 @@ jobs:
           echo "REPOSITORY_NAME=${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
           mv .pio/build/release/firmware.bin ${GITHUB_REPOSITORY##*/}-${GITHUB_REF#refs/*/}.bin
 
-      - name: Release project
+      - name: Release
         if: ${{ github.event_name == 'release' }}
         uses: softprops/action-gh-release@v0.1.5
         env:
