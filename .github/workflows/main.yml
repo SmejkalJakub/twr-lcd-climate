@@ -24,7 +24,7 @@ jobs:
       - name: Release
         if: ${{ github.event_name == 'release' }}
         id: release
-        uses: bruceadams/get-release
+        uses: bruceadams/get-release@v1.2.2
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
@@ -36,7 +36,7 @@ jobs:
 
       - name: Release project
         if: ${{ github.event_name == 'release' }}
-        uses: softprops/action-gh-release
+        uses: softprops/action-gh-release@v0.1.5
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
