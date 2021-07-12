@@ -14,8 +14,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-
       - name: Install Python dependencies
         uses: py-actions/py-dependency-install@v2
         with:
@@ -25,7 +23,9 @@ jobs:
           update-wheel: "false"
 
       - name: Compile the project
-        run: pio run -e release
+        run: |
+              pio run -e release
+              mv .pio/build/release/firmware.bin ${{ env.REPOSITORY_NAME }}-${{ env.GITHUB_TAG }}.bin
 
       - name: Release
         if: ${{ github.event_name == 'release' }}
@@ -46,8 +46,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          upload_url: ${{ steps.release.outputs.upload_url }}
-          asset_path: .pio/build/release/firmware.bin
-          asset_name: ${{ env.REPOSITORY_NAME }}-${{ env.GITHUB_TAG }}.bin
-          asset_content_type: application/octet-stream
-
+          files: ${{ env.REPOSITORY_NAME }}-${{ env.GITHUB_TAG }}.bin
