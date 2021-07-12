@@ -14,23 +14,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-      - name: Cache PlatformIO
-        uses: actions/cache@v2
-        with:
-          path: ~/.platformio
-          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+
 
       - name: Install Python dependencies
         uses: py-actions/py-dependency-install@v2
         with:
           path: "requirements.txt"
+          update-pip: "true"
+          update-setuptools: "false"
+          update-wheel: "false"
 
       - name: Compile the project
         run: pio run -e release
