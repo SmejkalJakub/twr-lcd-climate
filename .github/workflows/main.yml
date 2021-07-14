@@ -1,40 +1,31 @@
 name: build
-
 on:
   push:
     branches: [main, master]
   release:
     types: [published]
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Install Python dependencies
-        uses: py-actions/py-dependency-install@release
+        uses: py-actions/py-dependency-install@v2
         with:
           path: "requirements.txt"
           update-pip: "true"
           update-setuptools: "false"
           update-wheel: "false"
-
-      - name: Compile
+      - name: Build PlatformIO project
         run: pio run -e release
-
-      - name: Set env
+      - name: Rename firmware binary
         if: ${{ github.event_name == 'release' }}
-        run: |
-          echo "GITHUB_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-          echo "REPOSITORY_NAME=${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
-          mv .pio/build/release/firmware.bin ${GITHUB_REPOSITORY##*/}-${GITHUB_REF#refs/*/}.bin
-
-      - name: Release
+        run: mv .pio/build/release/firmware.bin ${GITHUB_REPOSITORY##*/}-${GITHUB_REF#refs/*/}.bin
+      - name: Publish to GitHub Releases
         if: ${{ github.event_name == 'release' }}
         uses: softprops/action-gh-release@v0
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          files: ${{ env.REPOSITORY_NAME }}-${{ env.GITHUB_TAG }}.bin
+          files: ${GITHUB_REPOSITORY##*/}-${GITHUB_REF#refs/*/}.bin
