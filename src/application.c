@@ -12,7 +12,7 @@
 #define TEMPERATURE_TAG_PUB_VALUE_CHANGE 0.5f
 #define HUMIDITY_TAG_PUB_VALUE_CHANGE 2
 
-#define RADIO_SEND_INTERVAL 29 * 1000               // 30 sekund
+#define RADIO_SEND_INTERVAL 30 * 1000               // 30 sekund
 
 #define MAX_PAGE_INDEX 1
 
@@ -179,7 +179,11 @@ void lcd_event_handler(twr_module_lcd_event_t event, void *event_param)
         active_mode = !active_mode;
         if(active_mode)
         {
+            first_battery_send = true;
+            twr_module_battery_init();
+            twr_module_battery_set_event_handler(battery_event_handler, NULL);
             twr_module_battery_set_update_interval(BATTERY_UPDATE_INITIAL_INTERVAL);
+
             twr_scheduler_plan_now(0);
         }
         else
@@ -248,7 +252,7 @@ void tmp112_event_handler(twr_tmp112_t *self, twr_tmp112_event_t event, void *ev
     {
         param->value = value;
 
-        if ((fabs(value - values.temperature) >= TEMPERATURE_TAG_PUB_VALUE_CHANGE))
+        if ((fabs(value - values.temperature) >= TEMPERATURE_TAG_PUB_VALUE_CHANGE) && active_mode)
         {
             twr_radio_pub_temperature(0, &value);
         }
@@ -271,7 +275,7 @@ void humidity_tag_event_handler(twr_tag_humidity_t *self, twr_tag_humidity_event
     {
         param->value = value;
 
-        if ((fabs(value - values.humidity) >= HUMIDITY_TAG_PUB_VALUE_CHANGE))
+        if ((fabs(value - values.humidity) >= HUMIDITY_TAG_PUB_VALUE_CHANGE) && active_mode)
         {
             twr_radio_pub_humidity(0, &value);
         }
@@ -301,6 +305,7 @@ void battery_event_handler(twr_module_battery_event_t event, void *event_param)
         {
             if(first_battery_send)
             {
+                first_battery_send = false;
                 twr_module_battery_set_update_interval(BATTERY_UPDATE_SERVICE_INTERVAL);
                 twr_scheduler_register(switch_to_normal_mode_task, NULL, SERVICE_INTERVAL_INTERVAL);
             }
